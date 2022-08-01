@@ -27,7 +27,7 @@ class Notifications(
     scale: Float = 1F,
     side: Side = Side(Side.Horizontal.RIGHT, Side.Vertical.DOWN)
 ) : Element(x, y, scale, side) {
-    val NotiMode = ListValue("Mode", arrayOf("Classic", "Modern"), "Modern")
+    val NotifyMode = ListValue("Mode", arrayOf("Classic", "Modern"), "Modern")
     private val backGroundAlphaValue = IntegerValue("BackGroundAlpha", 170, 0, 255)
     private val TitleShadow = BoolValue("Title Shadow", false)
     private val MotionBlur = BoolValue("Motion blur", false)
@@ -151,9 +151,9 @@ class Notification(
         GL11.glTranslated(transX, transY, 0.0)
 
         // draw notify
-
-        if(NotiMode.equals("Modern")) {
-
+        
+        when(NotifyMode.get().lowercase()) {
+            "modern" -> {
             if (blurRadius != 0f) { BlurUtils.draw(4 + (x + transX).toFloat() * scale, (y + transY).toFloat() * scale, (width * scale) , (height.toFloat()-5f) * scale, blurRadius) }
 
                 val colors = Color(type.renderColor.red, type.renderColor.green, type.renderColor.blue, alpha / 3)
@@ -253,10 +253,10 @@ class Notification(
                 FontLoaders.C12.DisplayFont2(FontLoaders.C12, title, 4F, 3F, Color(31, 41, 55).rgb, TitleShadow)
                 font.DisplayFont2(font, content, 4F, 10F, Color(31, 41, 55).rgb, ContentShadow)
             return false
+            
             }
-
-        if(NotiMode.equals("Classic")) {
-
+            
+            "classic" -> {
             if (blurRadius != 0f) { BlurUtils.draw((x + transX).toFloat() * scale, (y + transY).toFloat() * scale, width * scale, height * scale, blurRadius) }
                 RenderUtils.drawRect(0F, 0F, width.toFloat(), classicHeight.toFloat(), Color(0, 0, 0, alpha))
                 RenderUtils.drawRect(
@@ -269,8 +269,10 @@ class Notification(
                 font.drawString(title, 4F, 4F, Color.WHITE.rgb, false)
                 font.drawString(content, 4F, 17F, Color.WHITE.rgb, false)
             }
-        return false
+            return false            
+            }
         }
+
     }
 //NotifyType Color
 enum class NotifyType(var renderColor: Color) {
