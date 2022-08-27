@@ -7,7 +7,6 @@ import jdk.nashorn.api.scripting.ScriptUtils
 import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.launch.data.modernui.scriptOnline.Subscriptions
 import net.ccbluex.liquidbounce.script.api.*
 import net.ccbluex.liquidbounce.script.api.global.Chat
 import net.ccbluex.liquidbounce.script.api.global.Notifications
@@ -62,12 +61,6 @@ class Script(private val scriptFile: File) : MinecraftInstance() {
         scriptEngine.put("PacketUtils", PacketUtils)
         scriptEngine.put("InventoryUtils", InventoryUtils)
 
-        // Global functions
-        scriptEngine.put("registerScript", RegisterScript())
-        if (Subscriptions.loadingCloud) {
-            scriptText = Subscriptions.tempJs
-            isOnline = true
-        }
         supportLegacyScripts()
 
         scriptEngine.eval(scriptText)

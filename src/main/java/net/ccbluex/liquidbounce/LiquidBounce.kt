@@ -18,8 +18,6 @@ import net.ccbluex.liquidbounce.launch.EnumLaunchFilter
 import net.ccbluex.liquidbounce.launch.LaunchFilterInfo
 import net.ccbluex.liquidbounce.launch.LaunchOption
 import net.ccbluex.liquidbounce.launch.data.GuiLaunchOptionSelectMenu
-import net.ccbluex.liquidbounce.launch.data.modernui.scriptOnline.ScriptSubscribe
-import net.ccbluex.liquidbounce.launch.data.modernui.scriptOnline.Subscriptions
 import net.ccbluex.liquidbounce.script.ScriptManager
 import net.ccbluex.liquidbounce.ui.cape.GuiCapeManager
 import net.ccbluex.liquidbounce.ui.client.hud.HUD
@@ -78,7 +76,6 @@ object LiquidBounce {
 
     lateinit var commandManager: CommandManager
     lateinit var eventManager: EventManager
-    lateinit var subscriptions: Subscriptions
     lateinit var fileManager: FileManager
     lateinit var scriptManager: ScriptManager
     lateinit var tipSoundManager: TipSoundManager
@@ -125,7 +122,6 @@ object LiquidBounce {
         // Create file manager
         fileManager = FileManager()
         configManager = ConfigManager()
-        subscriptions = Subscriptions()
 
         // Create event manager
         eventManager = EventManager()
@@ -196,16 +192,6 @@ object LiquidBounce {
             thread(block = this::checkUpdate)
         }
         ClientUtils.logInfo("Loading Script Subscripts...")
-        for (subscript in fileManager.subscriptsConfig.subscripts) {
-            Subscriptions.addSubscribes(ScriptSubscribe(subscript.url, subscript.name))
-            scriptManager.disableScripts()
-            scriptManager.unloadScripts()
-            for (scriptSubscribe in Subscriptions.subscribes) {
-                scriptSubscribe.load()
-            }
-            scriptManager.loadScripts()
-            scriptManager.enableScripts()
-        }
         ClientUtils.setTitle();
         ClientUtils.logInfo("$CLIENT_NAME $CLIENT_VERSION loaded in ${(System.currentTimeMillis() - startTime)}ms!")
     }
