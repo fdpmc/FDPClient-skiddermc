@@ -25,7 +25,7 @@ class GuiLaunchOptionSelectMenu : GuiScreen() {
 
     override fun actionPerformed(button: GuiButton) {
         LiquidBounce.launchFilters.addAll(when (button.id) {
-            0 -> arrayListOf(EnumLaunchFilter.LEGACY_UI)
+            0 -> arrayListOf(EnumLaunchFilter.MODERN_UI)
             1 -> arrayListOf(EnumLaunchFilter.CLASSIC_UI)
             else -> emptyList()
         })
