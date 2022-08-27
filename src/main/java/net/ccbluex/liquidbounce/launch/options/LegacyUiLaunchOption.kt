@@ -11,7 +11,7 @@ import net.ccbluex.liquidbounce.launch.data.sharedui.clickgui.ClickGui
 import java.io.File
 
 @LaunchFilterInfo([EnumLaunchFilter.MODERN_UI])
-object shareduiLaunchOption : LaunchOption() {
+object modernuiLaunchOption : LaunchOption() {
 
     @JvmStatic
     lateinit var clickGui: ClickGui
