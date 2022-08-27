@@ -4,10 +4,10 @@ import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.launch.EnumLaunchFilter
 import net.ccbluex.liquidbounce.launch.LaunchFilterInfo
 import net.ccbluex.liquidbounce.launch.LaunchOption
-import net.ccbluex.liquidbounce.launch.data.modernui.ClickGUIModule
-import net.ccbluex.liquidbounce.launch.data.modernui.ClickGuiConfig
+import net.ccbluex.liquidbounce.launch.data.sharedui.ClickGUIModule
+import net.ccbluex.liquidbounce.launch.data.sharedui.ClickGuiConfig
 import net.ccbluex.liquidbounce.launch.data.classicui.GuiMainMenu
-import net.ccbluex.liquidbounce.launch.data.modernui.clickgui.ClickGui
+import net.ccbluex.liquidbounce.launch.data.sharedui.clickgui.ClickGui
 import java.io.File
 
 @LaunchFilterInfo([EnumLaunchFilter.CLASSIC_UI])
