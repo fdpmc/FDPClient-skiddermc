@@ -12,7 +12,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 
-class Matrix117Fly : FlyMode("Matrix1.17") {
+class OldMatrix117Fly : FlyMode("OldMatrix1.17") {
 
     /**
      * 在空中发送onGround包会增加FakeGround VL
