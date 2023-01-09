@@ -20,7 +20,7 @@ class VulcanDamageFly : FlyMode("VulcanDamage") {
     private var lastSentY = 0.0
     private var lastSentZ = 0.0
 
-    override fun onEnable() {
+    override fun onEnable() { //todo: 改成简简单单的Jump Damage :爱心黄豆:
         flag = false
         lastSentX = mc.thePlayer.posX
         lastSentY = mc.thePlayer.posY
