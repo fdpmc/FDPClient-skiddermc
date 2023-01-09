@@ -13,9 +13,9 @@ import net.ccbluex.liquidbounce.ui.font.Fonts;
 import net.ccbluex.liquidbounce.utils.MovementUtils;
 import net.ccbluex.liquidbounce.utils.PacketUtils;
 import net.ccbluex.liquidbounce.utils.render.RenderUtils;
-import net.ccbluex.liquidbounce.value.BoolValue;
-import net.ccbluex.liquidbounce.value.FloatValue;
-import net.ccbluex.liquidbounce.value.IntegerValue;
+import net.ccbluex.liquidbounce.features.value.BoolValue;
+import net.ccbluex.liquidbounce.features.value.FloatValue;
+import net.ccbluex.liquidbounce.features.value.IntegerValue;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
@@ -117,8 +117,8 @@ public class BowJump extends Module {
         case 3:
             if (hypixelBypassValue.get()) {
                 if (mc.thePlayer.hurtTime == 8) {
-                    mc.thePlayer.motionY = 0.45f;
-                    MovementUtils.INSTANCE.strafe(0.744107f);
+                    mc.thePlayer.motionY = 0.42f;
+                    MovementUtils.INSTANCE.strafe(0.67f);
                 }
 
                 if (mc.thePlayer.hurtTime == 7) {

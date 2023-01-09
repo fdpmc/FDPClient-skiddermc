@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.ui.client.hud.element.elements.*
 import net.ccbluex.liquidbounce.utils.ClassUtils
 import net.ccbluex.liquidbounce.utils.ClientUtils
 import net.ccbluex.liquidbounce.utils.MinecraftInstance
+import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
 import kotlin.math.max
 import kotlin.math.min
@@ -41,16 +42,23 @@ open class HUD : MinecraftInstance() {
                 .addElement(Arraylist())
                 .addElement(ScoreboardElement())
                 .addElement(Armor())
-                .addElement(Effects())
                 .addElement(Notifications())
+                .addElement(Indicators())
                 .addElement(Targets())
-                .addElement(Statistics())
         }
     }
 
     /**
      * Render all elements
      */
+
+    fun handleDamage(ent: EntityPlayer) {
+        for (element in elements) {
+            if (element.info.retrieveDamage)
+                element.handleDamage(ent)
+        }
+    }
+
     fun render(designer: Boolean, partialTicks: Float) {
         for (element in elements) {
             GL11.glPushMatrix()

@@ -14,12 +14,12 @@ import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.special.*
 import net.ccbluex.liquidbounce.file.FileManager
 import net.ccbluex.liquidbounce.file.config.ConfigManager
-import net.ccbluex.liquidbounce.launch.EnumLaunchFilter
-import net.ccbluex.liquidbounce.launch.LaunchFilterInfo
-import net.ccbluex.liquidbounce.launch.LaunchOption
-import net.ccbluex.liquidbounce.launch.data.GuiLaunchOptionSelectMenu
-import net.ccbluex.liquidbounce.launch.data.modernui.scriptOnline.ScriptSubscribe
-import net.ccbluex.liquidbounce.launch.data.modernui.scriptOnline.Subscriptions
+import net.ccbluex.liquidbounce.ui.client.gui.EnumLaunchFilter
+import net.ccbluex.liquidbounce.ui.client.gui.LaunchFilterInfo
+import net.ccbluex.liquidbounce.ui.client.gui.LaunchOption
+import net.ccbluex.liquidbounce.ui.client.gui.GuiLaunchOptionSelectMenu
+import net.ccbluex.liquidbounce.ui.client.gui.scriptOnline.ScriptSubscribe
+import net.ccbluex.liquidbounce.ui.client.gui.scriptOnline.Subscriptions
 import net.ccbluex.liquidbounce.script.ScriptManager
 import net.ccbluex.liquidbounce.ui.cape.GuiCapeManager
 import net.ccbluex.liquidbounce.ui.client.hud.HUD
@@ -42,10 +42,9 @@ object LiquidBounce {
     const val CLIENT_NAME = "FDPClient"
 
     var Darkmode = true
-    const val COLORED_NAME = "§7[§f!§7] §b§lFDPCLIENT §f» "
-    const val CLIENT_CREATOR = "CCBlueX & SkidderMC TEAM"
+    const val COLORED_NAME = "§7[§b§lFDPClient§7] "
+    const val CLIENT_CREATOR = "CCBlueX, Zywl & SkidderMC TEAM"
     const val CLIENT_WEBSITE = "fdpinfo.github.io"
-    const val VERSIONTYPE = "BETA" // Change to RELEASE on release and BETA on beta
     
     @JvmField
     val gitInfo = Properties().also {
@@ -53,13 +52,13 @@ object LiquidBounce {
         if (inputStream != null) {
             it.load(inputStream)
         } else {
-            it["git.branch"] = "Main" // fill with default values or we'll get null pointer exceptions
+            it["git.branch"] = "Main" 
         }
     }
 
     @JvmField
 
-    val CLIENT_VERSION = "v5.0.0f"
+    val CLIENT_VERSION = "v5.1.5"
 
 
     @JvmField
@@ -258,7 +257,7 @@ object LiquidBounce {
 
             // Save all available configs
             GuiCapeManager.save()
-            configManager.save(true, true)
+            configManager.save(true, forceSave = true)
             fileManager.saveAllConfigs()
 
             dynamicLaunchOptions.forEach {

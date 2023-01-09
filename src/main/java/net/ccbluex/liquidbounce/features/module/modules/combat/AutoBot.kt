@@ -11,10 +11,10 @@ import net.ccbluex.liquidbounce.utils.Rotation
 import net.ccbluex.liquidbounce.utils.RotationUtils
 import net.ccbluex.liquidbounce.utils.misc.FallingPlayer
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.projectile.EntityFireball
 import net.minecraft.init.Items
@@ -24,7 +24,7 @@ import net.minecraft.potion.Potion
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 
-@ModuleInfo("AutoBot", ModuleCategory.COMBAT)
+@ModuleInfo("AutoBot", category = ModuleCategory.COMBAT)
 class AutoBot : Module() {
     private val autoSoupValue = BoolValue("AutoSoup", true)
     private val autoPotValue = BoolValue("AutoPot", true)

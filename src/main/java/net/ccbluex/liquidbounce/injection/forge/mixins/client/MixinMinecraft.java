@@ -10,9 +10,11 @@ import net.ccbluex.liquidbounce.features.module.modules.client.SoundModule;
 import net.ccbluex.liquidbounce.features.module.modules.client.Rotations;
 import net.ccbluex.liquidbounce.features.module.modules.combat.AutoClicker;
 import net.ccbluex.liquidbounce.features.module.modules.exploit.MultiActions;
+import net.ccbluex.liquidbounce.features.module.modules.render.PerspectiveMod;
 import net.ccbluex.liquidbounce.features.module.modules.world.FastPlace;
 import net.ccbluex.liquidbounce.features.special.DiscordRPC;
 import net.ccbluex.liquidbounce.injection.access.StaticStorage;
+import net.ccbluex.liquidbounce.injection.forge.mixins.accessors.MinecraftForgeClientAccessor;
 import net.ccbluex.liquidbounce.utils.CPSCounter;
 import net.ccbluex.liquidbounce.utils.ClientUtils;
 import net.ccbluex.liquidbounce.utils.RotationUtils;
@@ -33,9 +35,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Util;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -49,6 +53,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import static org.objectweb.asm.Opcodes.PUTFIELD;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -146,6 +152,15 @@ public abstract class MixinMinecraft {
         StaticStorage.scaledResolution = new ScaledResolution((Minecraft) (Object) this);
     }
 
+    @Redirect(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;thirdPersonView:I", opcode = PUTFIELD))
+    public void setThirdPersonView(GameSettings gameSettings, int value) {
+        if(PerspectiveMod.perspectiveToggled) {
+            PerspectiveMod.resetPerspective();
+        } else {
+            gameSettings.thirdPersonView = value;
+        }
+    }
+
     public long getTime() {
         return (Sys.getTime() * 1000) / Sys.getTimerResolution();
     }
@@ -217,6 +232,15 @@ public abstract class MixinMinecraft {
             }
         }
     }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;theWorld:Lnet/minecraft/client/multiplayer/WorldClient;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    private void clearRenderCache(CallbackInfo ci) {
+        MinecraftForgeClient.getRenderPass();
+        MinecraftForgeClientAccessor.getRegionCache().invalidateAll();
+        MinecraftForgeClientAccessor.getRegionCache().cleanUp();
+    }
+
+
 
     /**
      * @author CCBlueX

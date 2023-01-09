@@ -13,10 +13,10 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.features.module.modules.exploit.Phase
 import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.stats.StatList
 import net.minecraft.util.MathHelper
@@ -32,10 +32,10 @@ class Step : Module() {
      * OPTIONS
      */
 
-    private val modeValue = ListValue("Mode", arrayOf("Vanilla", "Jump", "Matrix6.7.0",
+    val modeValue = ListValue("Mode", arrayOf("Vanilla", "Jump", "Matrix6.7.0",
                                                       "NCP", "NCPNew", "MotionNCP", "MotionNCP2", "OldNCP",
                                                       "OldAAC", "LAAC", "AAC3.3.4", "AAC3.6.4", "AAC4.4.0",
-                                                      "Spartan", "Rewinside", "Vulcan", "Verus"), "NCP")
+                                                      "Spartan", "Rewinside", "Vulcan", "Verus", "BlocksMC"), "NCP")
     private val heightValue = FloatValue("Height", 1F, 0.6F, 10F)
     private val jumpHeightValue = FloatValue("JumpMotion", 0.42F, 0.37F, 0.42F).displayable { modeValue.equals("Jump") || modeValue.equals("TimerJump") }
     private val delayValue = IntegerValue("Delay", 0, 0, 500)
@@ -629,6 +629,19 @@ class Step : Module() {
                             stepY + 0.7531999805212, stepZ, false))
                         mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(stepX,
                             stepY + 1.001335979112147, stepZ, false))
+
+                        // Reset timer
+                        timer.reset()
+                    }
+                    mode.equals("BlocksMC", ignoreCase = true) -> {
+                        fakeJump()
+
+                        mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(stepX,
+                            stepY + 0.41999998688698, stepZ, false))
+                        mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(stepX,
+                            stepY + 0.7531999805212, stepZ, false))
+                        mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(stepX,
+                            stepY + 1, stepZ, true))
 
                         // Reset timer
                         timer.reset()

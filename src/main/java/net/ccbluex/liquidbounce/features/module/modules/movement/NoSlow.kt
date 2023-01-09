@@ -11,10 +11,10 @@ import net.ccbluex.liquidbounce.utils.ClientUtils
 import net.ccbluex.liquidbounce.utils.MovementUtils 
 import net.ccbluex.liquidbounce.utils.PacketUtils
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.item.*
 import net.minecraft.network.Packet
 import net.minecraft.network.play.INetHandlerPlayServer
@@ -38,12 +38,11 @@ class NoSlow : Module() {
     private val onlyGround = BoolValue("OnlyGround", false)
     private val customOnGround = BoolValue("CustomOnGround", false).displayable { modeValue.equals("Custom") }
     private val customDelayValue = IntegerValue("CustomDelay", 60, 10, 200).displayable { modeValue.equals("Custom") }
+    public val soulSandValue = BoolValue("SoulSand", true)
     //AACv4
     private val c07Value = BoolValue("AAC4-C07", true).displayable { modeValue.equals("AAC4") }
     private val c08Value = BoolValue("AAC4-C08", true).displayable { modeValue.equals("AAC4") }
     private val groundValue = BoolValue("AAC4-OnGround", true).displayable { modeValue.equals("AAC4") }
-    // Soulsand
-    val soulsandValue = BoolValue("Soulsand", false)
     // Slowdown on teleport
     private val teleportValue = BoolValue("Teleport", false)
     private val teleportModeValue = ListValue("TeleportMode", arrayOf("Vanilla", "VanillaNoSetback", "Custom", "Decrease"), "Vanilla").displayable { teleportValue.get() }
@@ -51,14 +50,12 @@ class NoSlow : Module() {
     private val teleportCustomSpeedValue = FloatValue("Teleport-CustomSpeed", 0.13f, 0f, 1f).displayable { teleportValue.get() && teleportModeValue.equals("Custom") }
     private val teleportCustomYValue = BoolValue("Teleport-CustomY", false).displayable { teleportValue.get() && teleportModeValue.equals("Custom") }
     private val teleportDecreasePercentValue = FloatValue("Teleport-DecreasePercent", 0.13f, 0f, 1f).displayable { teleportValue.get() && teleportModeValue.equals("Decrease") }
-    private val alert1Value = BoolValue("updateAlert1", true).displayable { false }
 
     private var pendingFlagApplyPacket = false
     private var lastMotionX = 0.0
     private var lastMotionY = 0.0
     private var lastMotionZ = 0.0
     private val msTimer = MSTimer()
-    private val alertTimer = MSTimer()
     private var sendBuf = false
     private var packetBuf = LinkedList<Packet<INetHandlerPlayServer>>()
     private var nextTemp = false
@@ -113,11 +110,6 @@ class NoSlow : Module() {
     fun onMotion(event: MotionEvent) {
         if(mc.thePlayer == null || mc.theWorld == null || (onlyGround.get() && !mc.thePlayer.onGround))
             return
-        if (alertTimer.hasTimePassed(10000) && alert1Value.get() && (modeValue.equals("Matrix") || modeValue.equals("Vulcan"))) {
-            alertTimer.reset()
-            ClientUtils.displayChatMessage("§8[§c§lNoSlow§8]§aPlease notice that Vulcan/Matrix NoSlow §cDO NOT §asupport FakeLag Disabler!")
-            ClientUtils.displayChatMessage("§8[§c§lNoSlow§8]§aType .noslow updateAlert1 to disable this notice!")
-        }
         val killAura = LiquidBounce.moduleManager[KillAura::class.java]!!
         if (!MovementUtils.isMoving()) {
             return

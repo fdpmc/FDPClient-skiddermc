@@ -5,7 +5,7 @@ import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.LongJump
 import net.ccbluex.liquidbounce.utils.ClassUtils
 import net.ccbluex.liquidbounce.utils.MinecraftInstance
-import net.ccbluex.liquidbounce.value.Value
+import net.ccbluex.liquidbounce.features.value.Value
 
 abstract class LongJumpMode(val modeName: String) : MinecraftInstance() {
     protected val valuePrefix = "$modeName-"
@@ -18,6 +18,9 @@ abstract class LongJumpMode(val modeName: String) : MinecraftInstance() {
 
     open fun onEnable() {}
     open fun onDisable() {}
+    
+    open fun onAttemptJump() {}
+    open fun onAttemptDisable() {}
 
     open fun onUpdate(event: UpdateEvent) {}
     open fun onPreMotion(event: MotionEvent) {}

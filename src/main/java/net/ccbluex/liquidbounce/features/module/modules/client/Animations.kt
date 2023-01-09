@@ -9,10 +9,10 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.render.EaseUtils
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 
 
 @ModuleInfo(name = "Animations", category = ModuleCategory.CLIENT, canEnable = false)
@@ -31,7 +31,7 @@ object Animations : Module() {
     val tabTimeValue = IntegerValue("TabTime", 500, 0, 1000).displayable { !tabModeValue.equals("None") }
     val translateXValue = FloatValue("TranslateX", 0.0f, 0.0f, 1.5f)
     val translateYValue = FloatValue("TranslateY", 0.0f, 0.0f, 0.5f)
-    val translateZValue = FloatValue("TranslateZ", 0.0f, 0.0f, -2.0f)
+    val translateZValue = FloatValue("TranslateZ", 0.0f, -2.0f, 0.0f)
     val rotateXValue = FloatValue("RotateX", 0.0f, -180f, 180f)
     val rotateYValue = FloatValue("RotateY", 0.0f, -180f, 180f)
     val rotateZValue = FloatValue("RotateZ", 0.0f, -180f, 180f)

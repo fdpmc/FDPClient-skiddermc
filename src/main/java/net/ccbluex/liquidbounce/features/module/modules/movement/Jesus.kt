@@ -14,22 +14,29 @@ import net.ccbluex.liquidbounce.utils.PacketUtils
 import net.ccbluex.liquidbounce.utils.block.BlockUtils
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.getBlock
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.ListValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
 import net.minecraft.block.BlockLiquid
 import net.minecraft.block.material.Material
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import kotlin.math.cos
-import kotlin.math.sin
 
 @ModuleInfo(name = "Jesus", category = ModuleCategory.MOVEMENT)
 class Jesus : Module() {
-    val modeValue = ListValue("Mode", arrayOf("Vanilla", "NCP", "Jump", "AAC", "AACFly", "AAC3.3.11", "AAC4.2.1", "Horizon1.4.6", "Spartan", "Twilight", "Matrix", "Medusa","Vulcan", "Dolphin", "Legit"), "Vanilla")
+    val modeValue = ListValue("Mode", arrayOf("Vanilla", "NCP", "Jump", "AAC", "AACFly", "AAC3.3.11", "AAC4.2.1", "Horizon1.4.6", "Spartan", "Twilight", "Matrix", "SilentYPort", "Dolphin", "Legit"), "Vanilla")
     private val noJumpValue = BoolValue("NoJump", false)
+    private val yportUpValue = FloatValue("YPort-Up", 0.1f, 0.0f, 0.5f).displayable { modeValue.equals("SilentYPort") }
+    private val yportDownValue = FloatValue("YPort-Down", 0.1f, 0.0f, 0.5f).displayable { modeValue.equals("SilentYPort") }
+    private val yportSpeedValue = FloatValue("YPort-SpeedModify", 1.0f, 0.0f, 1.5f).displayable { modeValue.equals("SilentYPort") }
+    private val yportGroundValue = BoolValue("YPort-SpoofGround", false).displayable { modeValue.equals("SilentYPort") }
+    private val yportConvertValue = BoolValue("YPort-ConvertGround", true)
+        .displayable { modeValue.equals("SilentYPort") && !yportGroundValue.get() }
+    private val yportConvertDelayValue = IntegerValue("YPort-ConvertDelay", 1000, 0, 2000)
+        .displayable { modeValue.equals("SilentYPort") && yportConvertValue.get() && !yportGroundValue.get() }
     private val jumpMotionValue = FloatValue("JumpMotion", 0.5f, 0.1f, 1f)
         .displayable { modeValue.equals("Jump") || modeValue.equals("AACFly") }
 
@@ -48,9 +55,17 @@ class Jesus : Module() {
         val blockPos = mc.thePlayer.position.down()
 
         when (modeValue.get().lowercase()) {
-            "ncp","medusa","vulcan" -> {
+            "ncp" -> {
                 if (isLiquidBlock() && mc.thePlayer.isInsideOfMaterial(Material.air)) {
                     mc.thePlayer.motionY = 0.08
+                }
+            }
+            "silentyport" -> {
+                if (mc.thePlayer.onGround && isLiquidBlock(AxisAlignedBB(mc.thePlayer.entityBoundingBox.maxX, mc.thePlayer.entityBoundingBox.maxY,
+                        mc.thePlayer.entityBoundingBox.maxZ, mc.thePlayer.entityBoundingBox.minX, mc.thePlayer.entityBoundingBox.minY - 0.015626,
+                        mc.thePlayer.entityBoundingBox.minZ))) {
+                            mc.thePlayer.motionX *= yportSpeedValue.get().toDouble()
+                            mc.thePlayer.motionZ *= yportSpeedValue.get().toDouble()
                 }
             }
             "jump" -> {
@@ -189,10 +204,8 @@ class Jesus : Module() {
 
         if (event.block is BlockLiquid && !isLiquidBlock() && !mc.thePlayer.isSneaking) {
             when (modeValue.get().lowercase()) {
-                "ncp", "vanilla", "jump", "medusa","vulcan" -> {
+                "ncp", "vanilla", "jump", "silentyport" -> {
                     event.boundingBox = AxisAlignedBB.fromBounds(event.x.toDouble(), event.y.toDouble(), event.z.toDouble(), (event.x + 1).toDouble(), (event.y + 1).toDouble(), (event.z + 1).toDouble())
-                    if (modeValue.get() == "Vulcan") 
-                        MovementUtils.strafe(MovementUtils.getSpeed() * 0.39f)
                 }
             }
         }
@@ -216,26 +229,19 @@ class Jesus : Module() {
                             }
                         }
                 }
-                "Medusa" -> {
-                    nextTick = !nextTick
-                    event.packet.y = mc.thePlayer.posY + if (nextTick) 0.1 else -0.1
-                    if (msTimer.hasTimePassed(1000)) {
-                        event.packet.onGround = true
-                        msTimer.reset()
-                    } else {
-                        event.packet.onGround = false
-                    }
-                }
-                "Vulcan" -> {
-                    nextTick = !nextTick
-                    event.packet.y = mc.thePlayer.posY + if (nextTick) 0.1 else -0.1
-                    if (msTimer.hasTimePassed(1500)) {
-                        event.cancelEvent()
-                        PacketUtils.sendPacketNoEvent(C03PacketPlayer(true))
-                        msTimer.reset()
-                    } else {
-                        event.packet.onGround = false
-                    }
+                "SilentYPort" -> {
+                    if (mc.thePlayer.onGround && isLiquidBlock(AxisAlignedBB(mc.thePlayer.entityBoundingBox.maxX, mc.thePlayer.entityBoundingBox.maxY,
+                        mc.thePlayer.entityBoundingBox.maxZ, mc.thePlayer.entityBoundingBox.minX, mc.thePlayer.entityBoundingBox.minY - 0.01,
+                        mc.thePlayer.entityBoundingBox.minZ))) {
+                            nextTick = !nextTick
+                            event.packet.y = mc.thePlayer.posY + if (nextTick) yportUpValue.get().toDouble() else -yportDownValue.get().toDouble()
+                            if (msTimer.hasTimePassed(yportConvertDelayValue.get().toLong()) && yportConvertValue.get() && !yportGroundValue.get()) {
+                                event.packet.onGround = true
+                                msTimer.reset()
+                            } else {
+                                event.packet.onGround = yportGroundValue.get()
+                            }
+                        }
                 }
             }
 
@@ -249,7 +255,7 @@ class Jesus : Module() {
         }
 
         val block = getBlock(BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.01, mc.thePlayer.posZ))
-        if ((noJumpValue.get() || modeValue.get() == "Vulcan")&& block is BlockLiquid) {
+        if (noJumpValue.get() && block is BlockLiquid) {
             event.cancelEvent()
         }
     }

@@ -11,16 +11,13 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.features.module.modules.client.button.*
-import net.ccbluex.liquidbounce.launch.data.modernui.ClickGUIModule.*
+import net.ccbluex.liquidbounce.features.value.*
+import net.ccbluex.liquidbounce.ui.client.gui.ClickGUIModule.*
 import net.ccbluex.liquidbounce.ui.cape.GuiCapeManager.height
 import net.ccbluex.liquidbounce.ui.client.hud.designer.GuiHudDesigner
 import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.ccbluex.liquidbounce.utils.render.ColorUtils.rainbow
 import net.ccbluex.liquidbounce.utils.render.EaseUtils
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.GlStateManager
@@ -39,6 +36,7 @@ object HUD : Module() {
     private val blurValue = BoolValue("Blur", false)
     val fontChatValue = BoolValue("FontChat", false)
     val chatRectValue = BoolValue("ChatRect", true)
+    val betterChatRectValue = BoolValue("BetterChatRect", true)
     val chatCombineValue = BoolValue("ChatCombine", true)
     val chatAnimValue = BoolValue("ChatAnimation", true)
     val HealthValue = BoolValue("Health", true)
@@ -55,8 +53,7 @@ object HUD : Module() {
     val arraylistYAxisAnimTypeValue = EaseUtils.getEnumEasingList("ArraylistYAxisAnimType")
     val arraylistYAxisAnimOrderValue = EaseUtils.getEnumEasingOrderList("ArraylistYAxisHotbarAnimOrder")
     val fontEpsilonValue = FloatValue("FontVectorEpsilon", 0.5f, 0f, 1.5f)
-    private val buttonValue = ListValue("Button", arrayOf("Better", "Rounded", "FLine", "Rise", "Vanilla"), "Rounded")
-    val mainMenuStyle = ListValue("MainMenu", arrayOf("Five", "Legacy"), "Five")
+    private val buttonValue = ListValue("Button", arrayOf("Better", "RGBRounded", "Wolfram", "Rounded", "Hyperium", "RGB", "Badlion", "Flat", "FLine", "Rise", "Vanilla"), "Rounded")
 
     private var lastFontEpsilon = 0f
 
@@ -156,6 +153,11 @@ object HUD : Module() {
             "rounded" -> RoundedButtonRenderer(button)
             "fline" -> FLineButtonRenderer(button)
             "rise" -> RiseButtonRenderer(button)
+            "hyperium" -> HyperiumButtonRenderer(button)
+            "rgb" -> RGBButtonRenderer(button)
+            "badlion" -> BadlionTwoButtonRenderer(button)
+            "rgbrounded" -> RGBRoundedButtonRenderer(button)
+            "wolfram" -> WolframButtonRenderer(button)
             else -> null // vanilla or unknown
         }
     }

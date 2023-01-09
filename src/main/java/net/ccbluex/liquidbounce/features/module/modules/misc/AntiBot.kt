@@ -13,10 +13,10 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.ClientUtils.displayChatMessage
 import net.ccbluex.liquidbounce.utils.extensions.getFullName
 import net.ccbluex.liquidbounce.utils.render.ColorUtils.stripColor
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
@@ -41,6 +41,7 @@ object AntiBot : Module() {
     private val derpValue = BoolValue("Derp", true)
     private val wasInvisibleValue = BoolValue("WasInvisible", false)
     private val validNameValue = BoolValue("ValidName", true)
+    private val hiddenNameValue = BoolValue("HiddenName", false)
     private val armorValue = BoolValue("Armor", false)
     private val pingValue = BoolValue("Ping", false)
     private val needHitValue = BoolValue("NeedHit", false)
@@ -108,6 +109,10 @@ object AntiBot : Module() {
         }
 
         if (validNameValue.get() && !entity.name.matches(regex)) {
+            return true
+        }
+        
+        if (hiddenNameValue.get() && ( entity.getName().contains("\u00A7") || (entity.hasCustomName() && entity.getCustomNameTag().contains(entity.getName()) ))){
             return true
         }
 
@@ -213,7 +218,11 @@ object AntiBot : Module() {
         }
 
         if (alwaysInRadiusValue.get() && !notAlwaysInRadius.contains(entity.entityId)) {
+            if (alwaysInRadiusRemoveValue.get()) {
+                mc.theWorld.removeEntity(entity)
+            }
             return true
+            
         }
 
         return entity.name.isEmpty() || entity.name == mc.thePlayer.name
@@ -261,9 +270,6 @@ object AntiBot : Module() {
 
             if ((!livingTimeValue.get() || entity.ticksExisted > livingTimeTicksValue.get() || !alwaysInRadiusWithTicksCheckValue.get()) && !notAlwaysInRadius.contains(entity.entityId) && mc.thePlayer.getDistanceToEntity(entity) > alwaysRadiusValue.get()) {
                 notAlwaysInRadius.add(entity.entityId)
-                if (alwaysInRadiusRemoveValue.get()) {
-                    mc.theWorld.removeEntity(entity)
-                }
             }
         }
     }

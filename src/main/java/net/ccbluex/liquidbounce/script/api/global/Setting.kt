@@ -8,7 +8,7 @@ package net.ccbluex.liquidbounce.script.api.global
 import jdk.nashorn.api.scripting.JSObject
 import jdk.nashorn.api.scripting.ScriptUtils
 import net.ccbluex.liquidbounce.features.*
-import net.ccbluex.liquidbounce.value.*
+import net.ccbluex.liquidbounce.features.value.*
 
 /**
  * Object used by the script API to provide an idiomatic way of creating module values.
@@ -28,6 +28,11 @@ object Setting {
         return BoolValue(name, default)
     }
 
+    @JvmStatic
+    fun bool(settingInfo: JSObject): BoolValue {
+        return boolean(settingInfo)
+    }
+
     /**
      * Creates an integer value.
      * @param settingInfo JavaScript object containing information about the value.
@@ -41,6 +46,11 @@ object Setting {
         val max = (settingInfo.getMember("max") as Number).toInt()
 
         return IntegerValue(name, default, min, max)
+    }
+
+    @JvmStatic
+    fun int(settingInfo: JSObject): IntegerValue {
+        return integer(settingInfo)
     }
 
     /**

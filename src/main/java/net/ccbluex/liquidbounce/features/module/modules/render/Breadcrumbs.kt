@@ -15,10 +15,10 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.EntityUtils
 import net.ccbluex.liquidbounce.utils.render.ColorUtils.rainbow
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.GLU
@@ -40,7 +40,7 @@ class Breadcrumbs : Module() {
     private val precisionValue = IntegerValue("Precision", 4, 1, 20)
     private val lineWidthValue = IntegerValue("LineWidth", 1, 1, 10).displayable { typeValue.equals("Line") }
     private val sphereScaleValue = FloatValue("SphereScale", 0.6f, 0.1f, 2f).displayable { typeValue.equals("Sphere") || typeValue.equals("Rise")}
-    private val onlyThirdPerson = BoolValue("OnlyThirdPerson", true)
+    private val onlyThirdPersonValue = BoolValue("OnlyThirdPerson", true)
 
     private val points = mutableMapOf<Int, MutableList<BreadcrumbPoint>>()
 
@@ -61,7 +61,7 @@ class Breadcrumbs : Module() {
 
     @EventTarget
     fun onRender3D(event: Render3DEvent) {
-        if (onlyThirdPerson.get() && mc.gameSettings.thirdPersonView == 0) return
+        if (onlyThirdPersonValue.get() && mc.gameSettings.thirdPersonView == 0) return
 
         val fTime = fadeTimeValue.get() * 1000
         val fadeSec = System.currentTimeMillis() - fTime

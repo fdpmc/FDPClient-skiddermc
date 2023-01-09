@@ -14,8 +14,8 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.features.module.modules.movement.speeds.SpeedMode
 import net.ccbluex.liquidbounce.utils.ClassUtils
 import net.ccbluex.liquidbounce.utils.MovementUtils
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import org.lwjgl.input.Keyboard
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.MOVEMENT, autoDisable = EnumAutoDisableType.FLAG, keyBind = Keyboard.KEY_V)
@@ -39,11 +39,12 @@ class Speed : Module() {
 
     private val noWater = BoolValue("NoWater", true)
     private val debug = BoolValue("Debug", false)
+    private val forceSprint = BoolValue("alwaysSprint", true)
 
     @EventTarget
     fun onUpdate(event: UpdateEvent) {
         if (mc.thePlayer.isSneaking || (mc.thePlayer.isInWater && noWater.get())) return
-        if (MovementUtils.isMoving()) mc.thePlayer.isSprinting = true
+        if (MovementUtils.isMoving() && forceSprint.get()) mc.thePlayer.isSprinting = true
         mode.onUpdate()
     }
 
@@ -54,7 +55,7 @@ class Speed : Module() {
             alert("YMotion: " + mc.thePlayer.motionY.toString())
         }
         
-        if (MovementUtils.isMoving()) {
+        if (MovementUtils.isMoving() && forceSprint.get()) {
             mc.thePlayer.isSprinting = true
         }
 
@@ -93,19 +94,15 @@ class Speed : Module() {
 
     @EventTarget
     fun onJump(event: JumpEvent) {
-        if (mode.noJump) {
-            event.cancelEvent()
-        }
+        mode.onJump(event)
     }
 
     override fun onEnable() {
-        if (mc.thePlayer == null) return
         mc.timer.timerSpeed = 1f
         mode.onEnable()
     }
 
     override fun onDisable() {
-        if (mc.thePlayer == null) return
         mc.timer.timerSpeed = 1f
         mode.onDisable()
     }

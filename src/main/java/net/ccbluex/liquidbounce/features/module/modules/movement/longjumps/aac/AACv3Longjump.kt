@@ -1,7 +1,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.movement.longjumps.aac
 
 import net.ccbluex.liquidbounce.event.UpdateEvent
-import net.ccbluex.liquidbounce.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumps.LongJumpMode
 import net.minecraft.util.EnumFacing
 
@@ -28,5 +28,12 @@ class AACv3Longjump : LongJumpMode("AACv3") {
             mc.thePlayer.setPosition(mc.thePlayer.posX + x, mc.thePlayer.posY, mc.thePlayer.posZ + z)
             teleported = true
         }
+    }
+    override fun onAttemptJump() {
+        mc.thePlayer.jump()
+        teleported = false
+    }
+    override fun onAttemptDisable() {
+        longjump.state = false
     }
 }

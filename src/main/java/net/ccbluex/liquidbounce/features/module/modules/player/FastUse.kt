@@ -11,9 +11,10 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.IntegerValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.IntegerValue
+import net.ccbluex.liquidbounce.features.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
 import net.minecraft.item.ItemBucketMilk
 import net.minecraft.item.ItemFood
 import net.minecraft.item.ItemPotion
@@ -26,9 +27,12 @@ class FastUse : Module() {
     private val timerValue = FloatValue("Timer", 1.22F, 0.1F, 2.0F).displayable { modeValue.equals("Timer") }
     private val durationValue = IntegerValue("InstantDelay", 14, 0, 35).displayable { modeValue.equals("DelayedInstant") }
     private val delayValue = IntegerValue("CustomDelay", 0, 0, 300).displayable { modeValue.equals("CustomDelay") }
+    private val viaFixValue = BoolValue("ViaVersion", false)
 
     private val msTimer = MSTimer()
     private var usedTimer = false
+    private var sentPacket = false
+    private var lastState = false
 
     private fun send(int: Int) {
         repeat(int) {
@@ -39,6 +43,18 @@ class FastUse : Module() {
     private fun send() {
         mc.netHandler.addToSendQueue(C03PacketPlayer(mc.thePlayer.onGround))
     }
+    
+    private fun stopUsing() {
+        if (viaFixValue.get()) {
+            sentPacket = true
+            if (mc.thePlayer.itemInUseCount < 10) {
+                mc.thePlayer.itemInUseCount = 20
+            }
+        } else {
+            sentPacket = false
+            mc.playerController.onStoppedUsingItem(mc.thePlayer)
+        }
+    }
 
     @EventTarget
     fun onUpdate(event: UpdateEvent) {
@@ -48,6 +64,19 @@ class FastUse : Module() {
         }
 
         if (!mc.thePlayer.isUsingItem) {
+            sentPacket = false
+            lastState = mc.thePlayer.isUsingItem
+            return
+        } else if(!lastState) {
+            sentPacket = false
+        }
+        
+        lastState = mc.thePlayer.isUsingItem
+        
+        if (viaFixValue.get() && sentPacket) {
+            if (mc.thePlayer.itemInUseCount < 10) {
+                mc.thePlayer.itemInUseCount = 20
+            }
             return
         }
 
@@ -77,20 +106,21 @@ class FastUse : Module() {
                     msTimer.reset()
                 }
                 "delayedinstant" -> if (mc.thePlayer.itemInUseDuration > durationValue.get()) {
-                    send(36 - mc.thePlayer.itemInUseDuration)
+                    send(35 - mc.thePlayer.itemInUseDuration)
 
-                    mc.playerController.onStoppedUsingItem(mc.thePlayer)
+                    stopUsing()
                 }
 
                 "ncp" -> if (mc.thePlayer.itemInUseDuration > 14) {
                     send(20)
 
-                    mc.playerController.onStoppedUsingItem(mc.thePlayer)}
+                    stopUsing()
+                }
 
                 "instant" -> {
                     send(35)
 
-                    mc.playerController.onStoppedUsingItem(mc.thePlayer)
+                    stopUsing()
                 }
                 "aac" -> {
                     mc.timer.timerSpeed = 0.49F
@@ -126,6 +156,12 @@ class FastUse : Module() {
                     msTimer.reset()
                 }
             }
+            if (mc.thePlayer.itemInUseDuration >= 30 && viaFixValue.get()) {
+                sentPacket = true
+                if (mc.thePlayer.itemInUseCount < 10) {
+                    mc.thePlayer.itemInUseCount = 20
+                }
+            }
         }
     }
 
@@ -144,6 +180,8 @@ class FastUse : Module() {
             mc.timer.timerSpeed = 1F
             usedTimer = false
         }
+        sentPacket = false
+        lastState = mc.thePlayer.isUsingItem
     }
 
     override val tag: String

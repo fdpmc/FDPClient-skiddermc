@@ -20,8 +20,9 @@ import net.ccbluex.liquidbounce.utils.render.Animation
 import net.ccbluex.liquidbounce.utils.render.ColorUtils.stripColor
 import net.ccbluex.liquidbounce.utils.render.EaseUtils
 import net.ccbluex.liquidbounce.utils.render.Translate
-import net.ccbluex.liquidbounce.value.Value
+import net.ccbluex.liquidbounce.features.value.Value
 import org.lwjgl.input.Keyboard
+import java.util.ArrayList
 
 open class Module : MinecraftInstance(), Listenable {
     // Module information
@@ -30,6 +31,9 @@ open class Module : MinecraftInstance(), Listenable {
     var expanded: Boolean = false
     val animation: AnimationHelper
     var name: String
+    private var suffix: String? = null
+    private val properties: List<Value<*>> = ArrayList<Value<*>>()
+    var toggled = false
     var localizedName = ""
         get() = field.ifEmpty { name }
     var description: String
@@ -79,7 +83,7 @@ open class Module : MinecraftInstance(), Listenable {
     init {
         name = moduleInfo.name
         animation = AnimationHelper(this)
-        description = "%module.$name.description%"
+        description = moduleInfo.description.ifEmpty { LanguageManager.getAndFormat("module.$name.description") }
         category = moduleInfo.category
         keyBind = moduleInfo.keyBind
         array = moduleInfo.array
@@ -112,7 +116,7 @@ open class Module : MinecraftInstance(), Listenable {
                     LiquidBounce.hud.addNotification(Notification(LanguageManager.getAndFormat("notify.module.title"), LanguageManager.getAndFormat("notify.module.enable", localizedName), NotifyType.SUCCESS))
                 } else {
                     SoundModule.playSound(false)
-                    LiquidBounce.hud.addNotification(Notification("%notify.module.title%", LanguageManager.getAndFormat("notify.module.disable", localizedName), NotifyType.ERROR))
+                    LiquidBounce.hud.addNotification(Notification(LanguageManager.getAndFormat("notify.module.title"), LanguageManager.getAndFormat("notify.module.disable", localizedName), NotifyType.ERROR))
                 }
             }
 
@@ -167,6 +171,7 @@ open class Module : MinecraftInstance(), Listenable {
             }
         }
 
+
     // Tag
     open val tag: String?
         get() = null
@@ -184,6 +189,32 @@ open class Module : MinecraftInstance(), Listenable {
      */
     fun toggle() {
         state = !state
+    }
+    open fun getSuffix(): String? {
+        return suffix
+    }
+
+    open fun setSuffix(suffix: String?) {
+        this.suffix = suffix
+    }
+
+    open fun getProperties(): List<Value<*>?>? {
+        return properties
+    }
+
+    open fun hasMode(): Boolean {
+        return suffix != null
+    }
+    open fun isToggled(): Boolean {
+        return toggled
+    }
+    open fun toggleSilent() {
+        this.toggled = !this.toggled
+        if (this.toggled) {
+            onEnable()
+        } else {
+            onDisable()
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ import net.ccbluex.liquidbounce.utils.extensions.getBlock
 import net.ccbluex.liquidbounce.utils.extensions.getEyeVec3
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.*
+import net.ccbluex.liquidbounce.features.value.*
 import net.minecraft.block.Block
 import net.minecraft.block.BlockAir
 import net.minecraft.client.gui.ScaledResolution
@@ -243,7 +243,7 @@ object Fucker : Module() {
 
         @EventTarget
         fun onRender3D(event: Render3DEvent) {
-            when (renderValue.get().toLowerCase()) {
+            when (renderValue.get().lowercase()) {
                 "box" -> RenderUtils.drawBlockBox(pos ?: return, if (!coolDownTimer.hasTimePassed(coolDownValue.get().toLong() * 1000L)) Color.DARK_GRAY else Color.RED, false)
                 "outline" -> RenderUtils.drawBlockBox(pos ?: return, if (!coolDownTimer.hasTimePassed(coolDownValue.get().toLong() * 1000L)) Color.DARK_GRAY else Color.RED, true)
                 "2d" -> RenderUtils.draw2D(pos ?: return, if (!coolDownTimer.hasTimePassed(coolDownValue.get().toLong() * 1000L)) Color.DARK_GRAY.rgb else Color.RED.rgb, Color.BLACK.rgb)

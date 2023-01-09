@@ -4,7 +4,7 @@ import net.ccbluex.liquidbounce.event.EventState
 import net.ccbluex.liquidbounce.event.MotionEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.features.module.modules.movement.flys.FlyMode
-import net.ccbluex.liquidbounce.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -13,7 +13,7 @@ import kotlin.math.sin
 
 class VulcanFly : FlyMode("Vulcan") {
 
-    val canClipValue = BoolValue("CanClip", true)
+    private val canClipValue = BoolValue("CanClip", true)
 
     private var waitFlag = false
     private var canGlide = false

@@ -19,7 +19,7 @@ import net.ccbluex.liquidbounce.utils.EntityUtils
 import net.ccbluex.liquidbounce.utils.extensions.ping
 import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.*
-import net.ccbluex.liquidbounce.value.*
+import net.ccbluex.liquidbounce.features.value.*
 import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
@@ -38,6 +38,7 @@ class NameTags : Module() {
     private val healthBarValue = BoolValue("Bar", true)
     private val distanceValue = BoolValue("Distance", false)
     private val armorValue = BoolValue("Armor", true)
+    private val enchantValue = BoolValue("Enchant", true)
     private val potionValue = BoolValue("Potions", true)
     private val clearNamesValue = BoolValue("ClearNames", true)
     private val fontValue = FontValue("Font", Fonts.font40)
@@ -255,6 +256,32 @@ class NameTags : Module() {
                     disableBlend()
                     enableTexture2D()
                 }
+
+                if (enchantValue.get() && entity is EntityPlayer) {
+                    glPushMatrix()
+                    for (index in 0..4) {
+                        if (entity.getEquipmentInSlot(index) == null)
+                            continue
+
+                        mc.renderItem.renderItemOverlays(mc.fontRendererObj, entity.getEquipmentInSlot(index), -50 + index * 20, if (potionValue.get() && foundPotion) -42 else -22)
+                        drawExhiEnchants(entity.getEquipmentInSlot(index), -50f + index * 20f, if (potionValue.get() && foundPotion) -42f else -22f)
+                    }
+
+
+                    // Disable lightning and depth test
+                    glDisable(GL_LIGHTING)
+                    glDisable(GL_DEPTH_TEST)
+
+                    glEnable(GL_LINE_SMOOTH)
+
+                    // Enable blend
+                    glEnable(GL_BLEND)
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+                    glPopMatrix()
+                }
+
+
             }
 
             "jello" -> {
@@ -264,7 +291,7 @@ class NameTags : Module() {
                 if (jelloColorValue.get() && name.startsWith("§")) {
                     hpBarColor = ColorUtils.colorCode(name.substring(1, 2), jelloAlphaValue.get())
                 }
-                val bgColor = Color(50, 50, 50, jelloAlphaValue.get())
+                val bgColor = Color(20, 20, 20, jelloAlphaValue.get())
                 val width = fontRenderer.getStringWidth(tag) / 2
                 val maxWidth = (width + 4F) - (-width - 4F)
                 var healthPercent = entity.health / entity.maxHealth
@@ -278,8 +305,8 @@ class NameTags : Module() {
                     healthPercent = 1F
                 }
 
-                drawRect(-width - 4F, -3F, (-width - 4F) + (maxWidth * healthPercent), 1F, hpBarColor)
-                drawRect((-width - 4F) + (maxWidth * healthPercent), -3F, width + 4F, 1F, bgColor)
+                drawRect(-width - 4F, -3F, (-width - 4F) + (maxWidth * healthPercent), 0F, hpBarColor)
+                drawRect((-width - 4F) + (maxWidth * healthPercent), -3F, width + 4F, 0F, bgColor)
 
                 // string
                 fontRenderer.drawString(tag, -width, -fontRenderer.FONT_HEIGHT * 2 - 4, Color.WHITE.rgb)

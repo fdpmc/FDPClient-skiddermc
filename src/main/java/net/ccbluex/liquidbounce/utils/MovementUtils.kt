@@ -6,6 +6,7 @@
 package net.ccbluex.liquidbounce.utils
 
 import net.ccbluex.liquidbounce.event.MoveEvent
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.potion.Potion
@@ -56,6 +57,19 @@ object MovementUtils : MinecraftInstance() {
         mc.thePlayer.motionX = -sin(direction) * speed
         mc.thePlayer.motionZ = cos(direction) * speed
     }
+
+
+
+    fun defaultSpeed(): Double {
+        var baseSpeed = 0.2873
+        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
+            val amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed)
+                .amplifier
+            baseSpeed *= 1.0 + 0.2 * (amplifier + 1)
+        }
+        return baseSpeed
+    }
+
 
     fun doTargetStrafe(curTarget: EntityLivingBase, direction_: Float, radius: Float, moveEvent: MoveEvent, mathRadius: Int = 0) {
         if(!isMoving()) return
@@ -312,6 +326,17 @@ object MovementUtils : MinecraftInstance() {
                 true
             )
         )
+    }
+
+    @JvmStatic
+    fun getDirectioon(): Double {
+        var rotationYaw = mc.thePlayer.rotationYaw
+        if (mc.thePlayer.moveForward < 0f) rotationYaw += 180f
+        var forward = 1f
+        if (mc.thePlayer.moveForward < 0f) forward = -0.5f else if (mc.thePlayer.moveForward > 0f) forward = 0.5f
+        if (mc.thePlayer.moveStrafing > 0f) rotationYaw -= 90f * forward
+        if (mc.thePlayer.moveStrafing < 0f) rotationYaw += 90f * forward
+        return Math.toRadians(rotationYaw.toDouble())
     }
 
     fun isBlockUnder(): Boolean {

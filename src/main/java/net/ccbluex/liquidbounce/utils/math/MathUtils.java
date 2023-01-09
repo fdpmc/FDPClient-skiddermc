@@ -6,6 +6,10 @@
 package net.ccbluex.liquidbounce.utils.math;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.security.SecureRandom;
+import java.util.Random;
+
 public final class MathUtils {
     public static double round(final double value, final double inc) {
         if (inc == 0.0) return value;
@@ -20,6 +24,11 @@ public final class MathUtils {
             else return new BigDecimal(floored)
                     .doubleValue();
         }
+    }
+
+    public static double calculateGaussianDistribution(float x, float sigma) {
+        Random random = new Random();
+        return Math.sqrt(sigma) * random.nextGaussian() + x;
     }
 
     public static float interpolateFloat(float oldValue, float newValue, double interpolationValue){
@@ -46,6 +55,19 @@ public final class MathUtils {
     public static double incValue(double val, double inc) {
         double one = 1.0 / inc;
         return Math.round(val * one) / one;
+    }
+    public static double round(double value, int places) {
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    public static float getRandomFloat(float max, float min) {
+        SecureRandom random = new SecureRandom();
+        return random.nextFloat() * (max - min) + min;
     }
 
     public static double randomNumber(double max, double min) {

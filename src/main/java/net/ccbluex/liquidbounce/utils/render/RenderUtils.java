@@ -57,7 +57,7 @@ import java.util.*;
 import static akka.actor.Nobody.start;
 import static akka.actor.Nobody.stop;
 import static java.lang.Math.*;
-import static net.ccbluex.liquidbounce.launch.data.modernui.clickgui.style.styles.novoline.AnimationUtil.getAnimationState;
+import static net.ccbluex.liquidbounce.ui.client.gui.clickgui.style.styles.novoline.AnimationUtil.getAnimationState;
 import static net.minecraft.client.renderer.GlStateManager.disableBlend;
 import static net.minecraft.client.renderer.GlStateManager.enableTexture2D;
 import static org.lwjgl.opengl.GL11.*;
@@ -128,6 +128,15 @@ public final class RenderUtils extends MinecraftInstance {
         glEnable(GL_TEXTURE_2D);
         glPopMatrix();
     }
+
+    public static int reAlpha(int color, float alpha) {
+        Color c = new Color(color);
+        float r = 0.003921569f * (float)c.getRed();
+        float g = 0.003921569f * (float)c.getGreen();
+        float b = 0.003921569f * (float)c.getBlue();
+        return new Color(r, g, b, alpha).getRGB();
+    }
+
 
     protected static float zLevel = 0F;
 
@@ -468,6 +477,35 @@ public final class RenderUtils extends MinecraftInstance {
         if (drawText)
             Fonts.fontTahomaSmall.drawString(text, x, y, mainColor);
         return x + Fonts.fontTahomaSmall.getWidth(text) - 2F;
+    }
+
+    public static void drawFilledCircle(int xx, int yy, float radius, int col) {
+        float f = (float) (col >> 24 & 255) / 255.0f;
+        float f1 = (float) (col >> 16 & 255) / 255.0f;
+        float f2 = (float) (col >> 8 & 255) / 255.0f;
+        float f3 = (float) (col & 255) / 255.0f;
+        int sections = 50;
+        double dAngle = 6.283185307179586 / sections;
+        GL11.glPushMatrix();
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glEnable(2848);
+        GL11.glBlendFunc(770, 771);
+        GL11.glBegin(6);
+        int i = 0;
+        while (i < sections) {
+            float x = (float) (radius * Math.sin(i * dAngle));
+            float y = (float) (radius * Math.cos(i * dAngle));
+            GL11.glColor4f(f1, f2, f3, f);
+            GL11.glVertex2f((float) xx + x, (float) yy + y);
+            ++i;
+        }
+        GlStateManager.color(0.0f, 0.0f, 0.0f);
+        GL11.glEnd();
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+        GL11.glDisable(2848);
+        GL11.glPopMatrix();
     }
 
     public static void drawGradientRect(float left, float top, float right, float bottom, int startColor, int endColor) {
@@ -1105,34 +1143,18 @@ public final class RenderUtils extends MinecraftInstance {
         glEnd();
     }
     public static void drawGradientSidewaysV(double left, double top, double right, double bottom, int col1, int col2) {
-        float f = (float) (col1 >> 24 & 255) / 255.0f;
-        float f1 = (float) (col1 >> 16 & 255) / 255.0f;
-        float f2 = (float) (col1 >> 8 & 255) / 255.0f;
-        float f3 = (float) (col1 & 255) / 255.0f;
-        float f4 = (float) (col2 >> 24 & 255) / 255.0f;
-        float f5 = (float) (col2 >> 16 & 255) / 255.0f;
-        float f6 = (float) (col2 >> 8 & 255) / 255.0f;
-        float f7 = (float) (col2 & 255) / 255.0f;
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
-        GL11.glBlendFunc(770, 771);
-        GL11.glEnable(2848);
-        GL11.glShadeModel(7425);
-        GL11.glPushMatrix();
-        GL11.glBegin((int) 7);
-        GL11.glColor4f(f1, f2, f3, f);
-        GL11.glVertex2d(left, bottom);
-        GL11.glVertex2d(right, bottom);
-        GL11.glColor4f( f5,  f6, f7, f4);
-        GL11.glVertex2d(right, top);
-        GL11.glVertex2d(left, top);
-        GL11.glEnd();
-        GL11.glPopMatrix();
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
-        GL11.glShadeModel(7424);
-        Gui.drawRect(0, 0, 0, 0, 0);
+        glEnable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_LINE_SMOOTH);
+        glShadeModel(GL_SMOOTH);
+
+        quickDrawGradientSidewaysV(left, top, right, bottom, col1, col2);
+
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+        glDisable(GL_LINE_SMOOTH);
+        glShadeModel(GL_FLAT);
     }
     public static void quickDrawGradientSidewaysV(double left, double top, double right, double bottom, int col1, int col2) {
         glBegin(GL_QUADS);
@@ -2758,6 +2780,113 @@ public final class RenderUtils extends MinecraftInstance {
         tess.gluEndPolygon();
         tess.gluDeleteTess();
     }
+
+
+    public static void drawNewRect(double left, double top, double right, double bottom, int color) {
+        if (left < right) {
+            double i = left;
+            left = right;
+            right = i;
+        }
+        if (top < bottom) {
+            double j = top;
+            top = bottom;
+            bottom = j;
+        }
+        float f3 = (float)(color >> 24 & 0xFF) / 255.0f;
+        float f = (float)(color >> 16 & 0xFF) / 255.0f;
+        float f1 = (float)(color >> 8 & 0xFF) / 255.0f;
+        float f2 = (float)(color & 0xFF) / 255.0f;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer vertexbuffer = tessellator.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
+        GlStateManager.color(f, f1, f2, f3);
+        vertexbuffer.begin(7, DefaultVertexFormats.POSITION);
+        vertexbuffer.pos(left, bottom, 0.0).endVertex();
+        vertexbuffer.pos(right, bottom, 0.0).endVertex();
+        vertexbuffer.pos(right, top, 0.0).endVertex();
+        vertexbuffer.pos(left, top, 0.0).endVertex();
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawCheckeredBackground(final float x, float y, final float x2, final float y2) {
+        drawRect(x, y, x2, y2, getColor(16777215));
+        boolean offset = false;
+        while (y < y2) {
+            for (float x3 = x + ((offset = !offset) ? 1 : 0); x3 < x2; x3 += 2.0f) {
+                if (x3 <= x2 - 1.0f) {
+                    drawRect(x3, y, x3 + 1.0f, y + 1.0f, getColor(8421504));
+                }
+            }
+            ++y;
+        }
+    }
+
+    public static int getColor(final int color) {
+        final int r = color >> 16 & 0xFF;
+        final int g = color >> 8 & 0xFF;
+        final int b = color & 0xFF;
+        final int a = 255;
+        return (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF) | (a & 0xFF) << 24;
+    }
+
+    public static void scissor(final double x, final double y, final double width, final double height) {
+        int scaleFactor;
+        for (scaleFactor = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor(); scaleFactor < 2 && Minecraft.getMinecraft().displayWidth / (scaleFactor + 1) >= 320 && Minecraft.getMinecraft().displayHeight / (scaleFactor + 1) >= 240; ++scaleFactor) {}
+        GL11.glScissor((int)(x * scaleFactor), (int)(Minecraft.getMinecraft().displayHeight - (y + height) * scaleFactor), (int)(width * scaleFactor), (int)(height * scaleFactor));
+    }
+
+    public static void drawRoundedRectd(float paramXStart, float paramYStart, float paramXEnd, float paramYEnd, float radius, int color) {
+        drawRoundedRect(paramXStart, paramYStart, paramXEnd, paramYEnd, radius, color, true);
+    }
+
+    public static void drawGradientRect(final double d, final double e, final double e2, final double g, final int startColor, final int endColor) {
+        final float f = (startColor >> 24 & 0xFF) / 255.0f;
+        final float f2 = (startColor >> 16 & 0xFF) / 255.0f;
+        final float f3 = (startColor >> 8 & 0xFF) / 255.0f;
+        final float f4 = (startColor & 0xFF) / 255.0f;
+        final float f5 = (endColor >> 24 & 0xFF) / 255.0f;
+        final float f6 = (endColor >> 16 & 0xFF) / 255.0f;
+        final float f7 = (endColor >> 8 & 0xFF) / 255.0f;
+        final float f8 = (endColor & 0xFF) / 255.0f;
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
+        GlStateManager.shadeModel(7425);
+        final Tessellator tessellator = Tessellator.getInstance();
+        final WorldRenderer bufferbuilder = tessellator.getWorldRenderer();
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        bufferbuilder.pos(e2, e, (double)RenderUtils.zLevel).color(f2, f3, f4, f).endVertex();
+        bufferbuilder.pos(d, e, (double)RenderUtils.zLevel).color(f2, f3, f4, f).endVertex();
+        bufferbuilder.pos(d, g, (double)RenderUtils.zLevel).color(f6, f7, f8, f5).endVertex();
+        bufferbuilder.pos(e2, g, (double)RenderUtils.zLevel).color(f6, f7, f8, f5).endVertex();
+        tessellator.draw();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+    }
+
+    public static void render(final int mode, final Runnable render) {
+        GL11.glBegin(mode);
+        render.run();
+        GL11.glEnd();
+    }
+
+    public static void setup2DRendering(final Runnable f) {
+        GL11.glEnable(3042);
+        GL11.glBlendFunc(770, 771);
+        GL11.glDisable(3553);
+        f.run();
+        GL11.glEnable(3553);
+        GlStateManager.disableBlend();
+    }
+
 
     public static void tessVertex(GLUtessellator tessellator, double[] coords) {
         tessellator.gluTessVertex(coords, 0, new VertexData(coords));

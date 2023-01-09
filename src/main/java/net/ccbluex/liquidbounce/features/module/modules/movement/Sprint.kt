@@ -14,9 +14,9 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.utils.Rotation
 import net.ccbluex.liquidbounce.utils.RotationUtils
-import net.ccbluex.liquidbounce.value.BoolValue
-import net.ccbluex.liquidbounce.value.FloatValue
-import net.ccbluex.liquidbounce.value.ListValue
+import net.ccbluex.liquidbounce.features.value.BoolValue
+import net.ccbluex.liquidbounce.features.value.FloatValue
+import net.ccbluex.liquidbounce.features.value.ListValue
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.potion.Potion
 
@@ -49,8 +49,6 @@ class Sprint : Module() {
 
     @EventTarget
     fun onUpdate(event: UpdateEvent) {
-        mc.thePlayer.isSprinting = true
-
         if (!MovementUtils.isMoving() || mc.thePlayer.isSneaking || blindnessValue.get() &&
                 mc.thePlayer.isPotionActive(Potion.blindness) || foodValue.get() &&
                 !(mc.thePlayer.foodStats.foodLevel > 6.0f || mc.thePlayer.capabilities.allowFlying) ||
@@ -61,12 +59,16 @@ class Sprint : Module() {
             mc.thePlayer.isSprinting = false
             return
         }
+        if (mc.thePlayer.movementInput.moveForward < 0.8F && !allDirectionsValue.get()) {
+            mc.thePlayer.isSprinting = false
+            return
+        }
+        mc.thePlayer.isSprinting = true
 
         if (allDirectionsValue.get()) {
-            mc.thePlayer.isSprinting = true
             if (RotationUtils.getRotationDifference(Rotation((MovementUtils.direction * 180f / Math.PI).toFloat(), mc.thePlayer.rotationPitch)) > 30) {
                 when (allDirectionsBypassValue.get().lowercase()) {
-                    "rotate" -> RotationUtils.setTargetRotation(Rotation(MovementUtils.movingYaw, mc.thePlayer.rotationPitch), 10)
+                    "rotate" -> RotationUtils.setTargetRotation(Rotation(MovementUtils.movingYaw, mc.thePlayer.rotationPitch), 20)
                     "rotate2" -> {
                         val movingForward = mc.thePlayer.moveForward > 0.0F
                         val movingBackward = mc.thePlayer.moveForward < 0.0F
@@ -95,7 +97,7 @@ class Sprint : Module() {
                             direction += 135.0f
                         }
 
-                        RotationUtils.setTargetRotation(Rotation(direction, mc.thePlayer.rotationPitch), 10)
+                        RotationUtils.setTargetRotation(Rotation(direction, mc.thePlayer.rotationPitch), 20)
                         
                     }
                     "toggle" -> {
